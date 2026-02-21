@@ -1,0 +1,65 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@4
+
+jobs:
+  install_deps:
+    executor:
+      name: node/default
+      tag: "18"         # use Node 18 (adjust if needed)
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+
+  test:
+    executor:
+      name: node/default
+      tag: "18"
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-deps-{{ checksum "package-lock.json" }}
+            - node-deps-
+      - run:
+          name: Install dependencies
+          command: npm ci
+      - run:
+          name: Run unit tests
+          command: npm test -- --watch=false --browsers=ChromeHeadless
+      - save_cache:
+          paths:
+            - node_modules
+          key: node-deps-{{ checksum "package-lock.json" }}
+
+  build:
+    executor:
+      name: node/default
+      tag: "18"
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-deps-{{ checksum "package-lock.json" }}
+            - node-deps-
+      - run:
+          name: Build Angular App
+          command: npm run build -- --prod
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - install_deps
+      - test:
+          requires:
+            - install_deps
+      - build:
+          requires:
+            - test
