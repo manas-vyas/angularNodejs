@@ -1,13 +1,13 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@4
+  node: circleci/node@5
 
 jobs:
   install_deps:
     executor:
       name: node/default
-      tag: "18"         # use Node 18 (adjust if needed)
+      tag: "18.20.3"   # ✅ fixed full version
     steps:
       - checkout
       - node/install-packages:
@@ -16,7 +16,7 @@ jobs:
   test:
     executor:
       name: node/default
-      tag: "18"
+      tag: "18.20.3"   # ✅ fixed
     steps:
       - checkout
       - restore_cache:
@@ -37,7 +37,7 @@ jobs:
   build:
     executor:
       name: node/default
-      tag: "18"
+      tag: "18.20.3"   # ✅ fixed
     steps:
       - checkout
       - restore_cache:
@@ -46,7 +46,7 @@ jobs:
             - node-deps-
       - run:
           name: Build Angular App
-          command: npm run build -- --prod
+          command: npm run build -- --configuration=production
       - persist_to_workspace:
           root: .
           paths:
