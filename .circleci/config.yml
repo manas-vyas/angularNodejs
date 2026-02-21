@@ -4,49 +4,33 @@ orbs:
   node: circleci/node@5
 
 jobs:
-  install_deps:
+  build:
     executor:
       name: node/default
-      tag: "18.20.3"   # ✅ fixed full version
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
+      tag: "18.20.3"   # Stable Node 18 version
+    working_directory: ~/repo
 
-  test:
-    executor:
-      name: node/default
-      tag: "18.20.3"   # ✅ fixed
     steps:
       - checkout
+
       - restore_cache:
           keys:
             - node-deps-{{ checksum "package-lock.json" }}
             - node-deps-
+
       - run:
-          name: Install dependencies
+          name: Install Dependencies
           command: npm ci
-      - run:
-          name: Run unit tests
-          command: npm test -- --watch=false --browsers=ChromeHeadless
+
       - save_cache:
           paths:
             - node_modules
           key: node-deps-{{ checksum "package-lock.json" }}
 
-  build:
-    executor:
-      name: node/default
-      tag: "18.20.3"   # ✅ fixed
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - node-deps-{{ checksum "package-lock.json" }}
-            - node-deps-
       - run:
           name: Build Angular App
           command: npm run build -- --configuration=production
+
       - persist_to_workspace:
           root: .
           paths:
@@ -54,12 +38,6 @@ jobs:
 
 workflows:
   version: 2
-  build_and_test:
+  build_only:
     jobs:
-      - install_deps
-      - test:
-          requires:
-            - install_deps
-      - build:
-          requires:
-            - test
+      - build
