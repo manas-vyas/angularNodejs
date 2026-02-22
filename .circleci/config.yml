@@ -43,7 +43,7 @@ jobs:
           command: |
             scp -o StrictHostKeyChecking=no -r dist/* ec2-user@13.201.98.222:/home/ec2-user/
 
-            ssh -o StrictHostKeyChecking=no ec2-user@13.201.98.222 "sudo rm -rf /usr/share/nginx/html/* && sudo mv /home/ec2-user/cwh-todo-list* /usr/share/nginx/html/ && sudo systemctl restart nginx"
+            ssh -o StrictHostKeyChecking=no ec2-user@13.201.98.222 "sudo rm -rf /usr/share/nginx/html/* && sudo mv /home/ec2-user/cwh-todo-list/* /usr/share/nginx/html/ && sudo systemctl restart nginx"
 
 workflows:
   version: 2
