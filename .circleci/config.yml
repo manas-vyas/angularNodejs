@@ -41,15 +41,9 @@ jobs:
       - run:
           name: Deploy to EC2
           command: |
-            # Copy build to ec2-user home
             scp -o StrictHostKeyChecking=no -r dist/* ec2-user@13.201.98.222:/home/ec2-user/
 
-            # Move files using sudo
-            ssh -o StrictHostKeyChecking=no ec2-user@13.201.98.222 << 'EOF'
-              sudo rm -rf /usr/share/nginx/html/*
-              sudo mv /home/ec2-user/* /usr/share/nginx/html/
-              sudo systemctl restart nginx
-            EOF
+            ssh -o StrictHostKeyChecking=no ec2-user@13.201.98.222 "sudo rm -rf /usr/share/nginx/html/* && sudo mv /home/ec2-user/* /usr/share/nginx/html/ && sudo systemctl restart nginx"
 
 workflows:
   version: 2
