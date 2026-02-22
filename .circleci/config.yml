@@ -7,7 +7,8 @@ jobs:
   build:
     executor:
       name: node/default
-      tag: "14.16.1"   # Node version as requested
+      tag: "14.16.1"
+
     working_directory: ~/repo
 
     steps:
@@ -21,6 +22,12 @@ jobs:
           name: Build Angular App
           command: npx ng build --configuration=production
 
+      # Store Angular dist folder as artifact
+      - store_artifacts:
+          path: dist
+          destination: angular-build
+
+      # Optional: persist if you want to use in next job
       - persist_to_workspace:
           root: .
           paths:
