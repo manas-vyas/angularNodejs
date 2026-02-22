@@ -12,9 +12,11 @@ jobs:
 
     steps:
       - checkout
+
       - run:
           name: Install Dependencies
           command: npm ci
+
       - run:
           name: Build Angular App
           command: npx ng build --configuration=production
@@ -27,6 +29,7 @@ jobs:
   deploy:
     docker:
       - image: cimg/base:stable
+
     steps:
       - attach_workspace:
           at: .
@@ -36,18 +39,17 @@ jobs:
             - "SHA256:9B2E9QSH9D3RUiEAveH8a2YsnMtzvrUhaYkqnGrm2J4"
 
       - run:
-	      name: Deploy to EC2		
-	      command: |		
-	        # Copy build to ec2-user home		
+          name: Deploy to EC2
+          command: |
+            # Copy build to ec2-user home
             scp -o StrictHostKeyChecking=no -r dist/* ec2-user@13.201.98.222:/home/ec2-user/
-      
+
             # Move files using sudo
             ssh -o StrictHostKeyChecking=no ec2-user@13.201.98.222 << 'EOF'
               sudo rm -rf /usr/share/nginx/html/*
               sudo mv /home/ec2-user/* /usr/share/nginx/html/
               sudo systemctl restart nginx
             EOF
-
 
 workflows:
   version: 2
