@@ -8,33 +8,46 @@ jobs:
     executor:
       name: node/default
       tag: "14.16.1"
-
     working_directory: ~/repo
 
     steps:
       - checkout
-
       - run:
-          name: Install Angular App Dependencies
+          name: Install Dependencies
           command: npm ci
-
       - run:
           name: Build Angular App
           command: npx ng build --configuration=production
 
-      # Store Angular dist folder as artifact
-      - store_artifacts:
-          path: dist
-          destination: angular-build
-
-      # Optional: persist if you want to use in next job
       - persist_to_workspace:
           root: .
           paths:
             - dist
 
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - attach_workspace:
+          at: .
+
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:9B2E9QSH9D3RUiEAveH8a2YsnMtzvrUhaYkqnGrm2J4"
+
+      - run:
+          name: Deploy to EC2
+          command: |
+
+            scp -o StrictHostKeyChecking=no -r dist/cwh-tod0-list/* ec2user@13.201.98.222:/usr/share/nginx/html/
+
+            ssh -o StrictHostKeyChecking=no ec2user@13.201.98.222 "sudo systemctl restart nginx"
+
 workflows:
   version: 2
-  build_only:
+  build_and_deploy:
     jobs:
       - build
+      - deploy:
+          requires:
+            - build
