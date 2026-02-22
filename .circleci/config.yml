@@ -39,9 +39,9 @@ jobs:
           name: Deploy to EC2
           command: |
 
-            scp -o StrictHostKeyChecking=no -r dist/cwh-tod0-list/* ec2user@13.201.98.222:/usr/share/nginx/html/
+            scp -o StrictHostKeyChecking=no -r dist/cwh-tod0-list/* ec2-user@13.201.98.222:/usr/share/nginx/html/
 
-            ssh -o StrictHostKeyChecking=no ec2user@13.201.98.222 "sudo systemctl restart nginx"
+            ssh -o StrictHostKeyChecking=no ec2-user@13.201.98.222 "sudo systemctl restart nginx"
 
 workflows:
   version: 2
